@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "host": [ "http://fake_api:8080" ],
+  "extra_config": {
+    "github_com/devopsfaith/krakend-cors": {
+      "allow_origins": [ "http://localhost:8080", "http://localhost:3000", "http://192.168.99.100:3000" ],
+      "allow_methods": [ "POST", "GET" ],
+      "allow_headers": ["Origin","Authorization","Content-Type"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "12h"
+    },
+    "github_com/devopsfaith/bloomfilter": {
+      "N": 10000000,
+      "P": 0.0000001,
+      "HashName": "optimal",
+      "TTL": 1500,
+      "port": 1234,
+      "TokenKeys": ["jti"]
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/rappi/token-issue",
+      "method": "POST",
+      "backend": [
+        {
+          "url_pattern": "/api/users/token-issue",
+          "host": ["http://login-mock:3333"]
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/signer": {
+          "alg": "HS256",
+          "kid": "sim2",
+          "keys-to-sign": ["access_token"],
+          "jwk-url": "http://fake_api:8080/jwk/symmetric.json",
+          "disable_jwk_security": true
+        }
+      }
+    },
+    {
+      "endpoint": "/rappi/test",
+      "backend": [
+        {
+          "host": ["http://login-mock:3333"],
+          "url_pattern": "/api/users/test-krakend"
+        }
+      ],
+      "extra_config": {
+        "github.com/devopsfaith/krakend-jose/validator": {
+          "alg": "HS256",
+          "roles_key": "scopes",
+          "roles": ["inventory", "payment"],
+          "jwk-url": "http://fake_api:8080/jwk/symmetric.json",
+          "disable_jwk_security": true
+        }
+      }
+    }
+  ]
+}
