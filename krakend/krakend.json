@@ -26,8 +26,13 @@
       "method": "POST",
       "backend": [
         {
-          "url_pattern": "/api/users/token-issue",
-          "host": ["http://login-mock:3333"]
+          "url_pattern": "/api/cpgops-integrations/retailers/token-issue",
+          "host": ["http://host.docker.internal:3000"],
+          "extra_config": {
+            "github.com/devopsfaith/krakend/http": {
+              "return_error_details": "error"
+            }
+          }
         }
       ],
       "extra_config": {
@@ -41,18 +46,33 @@
       }
     },
     {
-      "endpoint": "/rappi/test",
+      "endpoint": "/rappi/sign-up",
+      "output_encoding": "no-op",
+      "headers_to_pass":[
+        "*"
+      ],
+      "method": "POST",
       "backend": [
         {
-          "host": ["http://login-mock:3333"],
-          "url_pattern": "/api/users/test-krakend"
+          "host": ["http://host.docker.internal:3000"],
+          "url_pattern": "/api/cpgops-integrations/retailers/sign-up",
+          "encoding": "no-op",
+          "extra_config": {
+            "github.com/devopsfaith/krakend-martian": {
+              "header.Modifier": {
+                "scope": ["request"],
+                "name": "API_KEY",
+                "value": "myApiKey"
+              }
+            }
+          }
         }
       ],
       "extra_config": {
         "github.com/devopsfaith/krakend-jose/validator": {
           "alg": "HS256",
           "roles_key": "scopes",
-          "roles": ["inventory", "payment"],
+          "roles": ["retailers"],
           "jwk-url": "http://fake_api:8080/jwk/symmetric.json",
           "disable_jwk_security": true
         }
