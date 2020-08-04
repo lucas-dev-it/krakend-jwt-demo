@@ -5,7 +5,7 @@
   "host": [ "http://fake_api:8080" ],
   "extra_config": {
     "github_com/devopsfaith/krakend-cors": {
-      "allow_origins": [ "http://localhost:8080", "http://localhost:3000", "http://192.168.99.100:3000" ],
+      "allow_origins": [ "http://localhost:8080", "http://host.docker.internal:3001", "http://192.168.99.100:3001" ],
       "allow_methods": [ "POST", "GET" ],
       "allow_headers": ["Origin","Authorization","Content-Type"],
       "expose_headers": ["Content-Length"],
@@ -22,15 +22,19 @@
   },
   "endpoints": [
     {
-      "endpoint": "/rappi/token-issue",
+      "endpoint": "/api/v3/retailers/token-issue",
       "method": "POST",
       "backend": [
         {
-          "url_pattern": "/api/cpgops-integrations/retailers/token-issue",
-          "host": ["http://host.docker.internal:3000"],
+          "host": ["http://host.docker.internal:3001"],
+          "url_pattern": "/api/oa-retailers-iam/v3/retailers/token-issue",
           "extra_config": {
-            "github.com/devopsfaith/krakend/http": {
-              "return_error_details": "error"
+            "github.com/devopsfaith/krakend-martian": {
+              "header.Modifier": {
+                "scope": ["request"],
+                "name": "X-API-INTERNAL-KEY",
+                "value": "testKey"
+              }
             }
           }
         }
@@ -38,31 +42,28 @@
       "extra_config": {
         "github.com/devopsfaith/krakend-jose/signer": {
           "alg": "HS256",
-          "kid": "sim2",
+          "kid": "test_key_1",
           "keys-to-sign": ["access_token"],
-          "jwk-url": "http://fake_api:8080/jwk/symmetric.json",
+          "jwk-url": "http://host.docker.internal:3001/api/oa-retailers-iam/.well-known/jwk.json",
           "disable_jwk_security": true
         }
       }
     },
     {
-      "endpoint": "/rappi/sign-up",
+      "endpoint": "/api/v3/retailers/sign-up",
       "output_encoding": "no-op",
-      "headers_to_pass":[
-        "*"
-      ],
       "method": "POST",
       "backend": [
         {
-          "host": ["http://host.docker.internal:3000"],
-          "url_pattern": "/api/cpgops-integrations/retailers/sign-up",
+          "host": ["http://host.docker.internal:3001"],
+          "url_pattern": "/api/oa-retailers-iam/v3/retailers/sign-up",
           "encoding": "no-op",
           "extra_config": {
             "github.com/devopsfaith/krakend-martian": {
               "header.Modifier": {
                 "scope": ["request"],
-                "name": "API_KEY",
-                "value": "myApiKey"
+                "name": "X-API-INTERNAL-KEY",
+                "value": "testKey"
               }
             }
           }
@@ -73,7 +74,7 @@
           "alg": "HS256",
           "roles_key": "scopes",
           "roles": ["retailers"],
-          "jwk-url": "http://fake_api:8080/jwk/symmetric.json",
+          "jwk-url": "http://host.docker.internal:3001/api/oa-retailers-iam/.well-known/jwk.json",
           "disable_jwk_security": true
         }
       }
