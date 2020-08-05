@@ -63,7 +63,7 @@
               "header.Modifier": {
                 "scope": ["request"],
                 "name": "X-API-INTERNAL-KEY",
-                "value": "testKey"
+                "value": "{ $HEADER_API_KEY }"
               }
             }
           }

@@ -1,12 +1,5 @@
 version: "3"
 services:
-#  fake_api:
-#    image: jaxgeller/lwan
-#    volumes:
-#      - ./data:/lwan/wwwroot
-#    ports:
-#      - "8000:8080"
-
   krakend_ce:
     image: devopsfaith/krakend:1.1.1
     volumes:
@@ -25,12 +18,3 @@ services:
       - "9000:8080"
     depends_on:
       - krakend_ce
-
-#  login-mock:
-#    container_name: login-mock
-#    hostname: login-mock
-#    build:
-#      context: ./login-mock
-#    ports:
-#    - "3333:3333"
-
