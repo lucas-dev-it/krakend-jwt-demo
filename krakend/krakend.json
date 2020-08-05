@@ -60,10 +60,25 @@
           "encoding": "no-op",
           "extra_config": {
             "github.com/devopsfaith/krakend-martian": {
-              "header.Modifier": {
+              "fifo.Group": {
                 "scope": ["request"],
-                "name": "X-API-INTERNAL-KEY",
-                "value": "{ $HEADER_API_KEY }"
+                "aggregateErrors": true,
+                "modifiers": [
+                  {
+                    "header.Modifier": {
+                      "scope": ["request"],
+                      "name": "X-API-INTERNAL-KEY",
+                      "value": "{ $HEADER_API_KEY }"
+                    }
+                  },
+                  {
+                    "header.Modifier": {
+                      "scope": ["request"],
+                      "name": "X-COUNTRY",
+                      "value": "{ $HEADER_COUNTRY }"
+                    }
+                  }
+                ]
               }
             }
           }
